@@ -95,14 +95,17 @@ class KeymapFragment : Fragment(), MainActivity.KeyListener, View.OnClickListene
 
     private val keyCodeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val event = intent.getParcelableExtra<KeyEvent>(KeyIntent.extraEvent)
-            onKeyEvent(event)
+            val event = intent.getParcelableExtra(KeyIntent.extraEvent, KeyEvent::class.java)
+            if (event != null) {
+                onKeyEvent(event)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        context?.registerReceiver(keyCodeReceiver, IntentFilters.keyEvent)
+        context?.registerReceiver(keyCodeReceiver, IntentFilters.keyEvent,
+            Context.RECEIVER_EXPORTED)
     }
 
     override fun onPause() {

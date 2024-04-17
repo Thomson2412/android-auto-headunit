@@ -44,11 +44,11 @@ internal class AapAudio(
             length = AUDIO_BUFS_SIZE
         }
 
-        if (audioDecoder.getTrack(channel) == null) {
-            val config = AudioConfigs[channel] ?: error("Audio channel $channel does not have a configuration registered.")
-            val stream = AudioManager.STREAM_MUSIC
-            audioDecoder.start(channel, stream, config.sampleRate, config.numberOfBits, config.numberOfChannels)
-        }
+//        if (audioDecoder.getTrack(channel) == null) {
+//            val config = AudioConfigs[channel] ?: error("Audio channel $channel does not have a configuration registered.")
+//            val stream = AudioManager.STREAM_MUSIC
+//            audioDecoder.start(channel, stream, config.sampleRate, config.numberOfBits, config.numberOfChannels)
+//        }
 
         audioDecoder.decode(channel, buf, start, length)
     }

@@ -1,6 +1,7 @@
 package info.anodsplace.headunit.aap
 
-import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.app.UiModeManager
@@ -8,8 +9,8 @@ import android.content.*
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import info.anodsplace.headunit.App
 import info.anodsplace.headunit.R
 import info.anodsplace.headunit.aap.protocol.messages.NightModeEvent
@@ -18,10 +19,10 @@ import info.anodsplace.headunit.connection.SocketAccessoryConnection
 import info.anodsplace.headunit.connection.UsbAccessoryConnection
 import info.anodsplace.headunit.connection.UsbReceiver
 import info.anodsplace.headunit.contract.ConnectedIntent
-import info.anodsplace.headunit.location.GpsLocationService
-import info.anodsplace.headunit.utils.*
 import info.anodsplace.headunit.contract.DisconnectIntent
 import info.anodsplace.headunit.contract.LocationUpdateIntent
+import info.anodsplace.headunit.location.GpsLocationService
+import info.anodsplace.headunit.utils.*
 
 
 class AapService : Service(), UsbReceiver.Listener, AccessoryConnection.Listener {
@@ -49,6 +50,14 @@ class AapService : Service(), UsbReceiver.Listener, AccessoryConnection.Listener
         nightModeFilter.addAction(LocationUpdateIntent.action)
         registerReceiver(nightModeReceiver, nightModeFilter)
         registerReceiver(usbReceiver, UsbReceiver.createFilter())
+
+        val channel = NotificationChannel(
+            App.DEFAULT_CHANNEL,
+            "HeadUnit Foreground Service",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 
     override fun onDestroy() {
@@ -56,7 +65,7 @@ class AapService : Service(), UsbReceiver.Listener, AccessoryConnection.Listener
         onDisconnect()
         unregisterReceiver(nightModeReceiver)
         unregisterReceiver(usbReceiver)
-        uiModeManager.disableCarMode(0)
+        uiModeManager.disableCarMode(UiModeManager.DISABLE_CAR_MODE_GO_HOME)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -67,9 +76,9 @@ class AapService : Service(), UsbReceiver.Listener, AccessoryConnection.Listener
             return START_NOT_STICKY
         }
 
-        uiModeManager.enableCarMode(0)
+        uiModeManager.enableCarMode(UiModeManager.ENABLE_CAR_MODE_GO_CAR_HOME)
 
-        val notification = NotificationCompat.Builder(this, App.defaultChannel)
+        val notification = NotificationCompat.Builder(this, App.DEFAULT_CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_aa)
                 .setTicker("HeadUnit is running")
                 .setWhen(System.currentTimeMillis())
@@ -78,7 +87,7 @@ class AapService : Service(), UsbReceiver.Listener, AccessoryConnection.Listener
                 .setAutoCancel(false)
                 .setOngoing(true)
                 .setContentIntent(PendingIntent.getActivity(this, 0, AapProjectionActivity.intent(this), PendingIntent.FLAG_UPDATE_CURRENT))
-                .setPriority(Notification.PRIORITY_HIGH)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .build()
 
         startService(GpsLocationService.intent(this))

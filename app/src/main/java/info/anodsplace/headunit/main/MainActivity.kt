@@ -1,21 +1,13 @@
 package info.anodsplace.headunit.main
 
 import android.Manifest
-import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
-import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
-import info.anodsplace.headunit.App
 import info.anodsplace.headunit.R
-import info.anodsplace.headunit.aap.AapProjectionActivity
 import info.anodsplace.headunit.utils.AppLog
-import info.anodsplace.headunit.utils.NetworkUtils
 import info.anodsplace.headunit.utils.hideSystemUI
-import kotlinx.android.synthetic.main.activity_main.*
-import java.io.IOException
 
 class MainActivity : FragmentActivity() {
     var keyListener: KeyListener? = null
@@ -36,7 +28,7 @@ class MainActivity : FragmentActivity() {
         ActivityCompat.requestPermissions(this, arrayOf(
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.ACCESS_FINE_LOCATION
-        ), permissionRequestCode)
+        ), PERMISSION_REQUEST_CODE)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -57,6 +49,6 @@ class MainActivity : FragmentActivity() {
     }
 
     companion object {
-        private const val permissionRequestCode = 97
+        private const val PERMISSION_REQUEST_CODE = 97
     }
 }

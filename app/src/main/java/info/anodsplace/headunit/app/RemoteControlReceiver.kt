@@ -12,9 +12,11 @@ class RemoteControlReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (Intent.ACTION_MEDIA_BUTTON == intent.action) {
-            val event: KeyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
-            AppLog.i { "ACTION_MEDIA_BUTTON: " + event.keyCode }
-            App.provide(context).transport.send(event.keyCode, event.action == KeyEvent.ACTION_DOWN)
+            val event: KeyEvent? = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+            if (event != null) {
+                AppLog.i { "ACTION_MEDIA_BUTTON: " + event.keyCode }
+                App.provide(context).transport.send(event.keyCode, event.action == KeyEvent.ACTION_DOWN)
+            }
         }
     }
 }

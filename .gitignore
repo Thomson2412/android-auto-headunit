@@ -60,3 +60,6 @@ externalNativeBuild
 cert/
 playstore/
 .DS_Stor
+
+# Protobuf
+/app/src/main/java/info/anodsplace/headunit/aap/protocol/proto

@@ -16,6 +16,7 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -32,6 +33,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="androidx.car.app.NAVIGATION_TEMPLATES"/>
 
     <application
         android:name=".App"
@@ -50,7 +53,8 @@
         <activity
             android:name=".app.UsbAttachedActivity"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.Translucent">
+            android:theme="@style/AppTheme.Translucent"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
@@ -64,7 +68,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:exported="true">
 
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -77,13 +82,15 @@
         <service android:name=".aap.AapService" />
         <service android:name=".location.GpsLocationService" />
 
-        <receiver android:name=".app.RemoteControlReceiver">
+        <receiver android:name=".app.RemoteControlReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".app.BootCompleteReceiver" >
+        <receiver android:name=".app.BootCompleteReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

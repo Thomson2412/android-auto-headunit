@@ -2,11 +2,6 @@ package info.anodsplace.headunit
 
 import android.app.Application
 import android.content.Context
-import info.anodsplace.headunit.utils.AppLog
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.os.Build
-import java.io.File
 
 class App : Application() {
 
@@ -17,11 +12,11 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        registerReceiver(AapBroadcastReceiver(), AapBroadcastReceiver.filter)
+        registerReceiver(AapBroadcastReceiver(), AapBroadcastReceiver.filter, RECEIVER_EXPORTED)
     }
 
     companion object {
-        const val defaultChannel = "default"
+        const val DEFAULT_CHANNEL = "default"
 
         fun get(context: Context): App {
             return context.applicationContext as App

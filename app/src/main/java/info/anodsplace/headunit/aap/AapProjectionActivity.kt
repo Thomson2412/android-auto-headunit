@@ -17,10 +17,12 @@ import info.anodsplace.headunit.app.SurfaceActivity
 import info.anodsplace.headunit.utils.AppLog
 import info.anodsplace.headunit.utils.IntentFilters
 import info.anodsplace.headunit.contract.KeyIntent
-import kotlinx.android.synthetic.main.activity_headunit.*
+import info.anodsplace.headunit.databinding.ActivityHeadunitBinding
 
 class AapProjectionActivity : SurfaceActivity(), SurfaceHolder.Callback {
     private lateinit var screen: Screen
+    private lateinit var binding: ActivityHeadunitBinding
+
     private val disconnectReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             finish()
@@ -29,17 +31,21 @@ class AapProjectionActivity : SurfaceActivity(), SurfaceHolder.Callback {
 
     private val keyCodeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val event = intent.getParcelableExtra<KeyEvent>(KeyIntent.extraEvent)
-            onKeyEvent(event.keyCode, event.action == KeyEvent.ACTION_DOWN)
+            val event = intent.getParcelableExtra(KeyIntent.extraEvent, KeyEvent::class.java)
+            if (event != null) {
+                onKeyEvent(event.keyCode, event.action == KeyEvent.ACTION_DOWN)
+            }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityHeadunitBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         screen = Screen.forResolution(App.provide(this).settings.resolution)
 
-        surface.setSurfaceCallback(this)
-        surface.setOnTouchListener { _, event ->
+        binding.surface.setSurfaceCallback(this)
+        binding.surface.setOnTouchListener { _, event ->
             sendTouchEvent(event)
             true
         }
@@ -53,11 +59,11 @@ class AapProjectionActivity : SurfaceActivity(), SurfaceHolder.Callback {
 
     override fun onResume() {
         super.onResume()
-        registerReceiver(disconnectReceiver, IntentFilters.disconnect)
-        registerReceiver(keyCodeReceiver, IntentFilters.keyEvent)
+        registerReceiver(disconnectReceiver, IntentFilters.disconnect, RECEIVER_EXPORTED)
+        registerReceiver(keyCodeReceiver, IntentFilters.keyEvent, RECEIVER_EXPORTED)
     }
 
-    val transport: AapTransport
+    private val transport: AapTransport
         get() = App.provide(this).transport
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -80,8 +86,8 @@ class AapProjectionActivity : SurfaceActivity(), SurfaceHolder.Callback {
         val pointerData = mutableListOf<Triple<Int, Int, Int>>()
         repeat(event.pointerCount) { pointerIndex ->
             val pointerId = event.getPointerId(pointerIndex)
-            val x = event.getX(pointerIndex) / (surface.width / screen.width.toFloat())
-            val y = event.getY(pointerIndex) / (surface.height / screen.height.toFloat())
+            val x = event.getX(pointerIndex) / (binding.surface.width / screen.width.toFloat())
+            val y = event.getY(pointerIndex) / (binding.surface.height / screen.height.toFloat())
             if (x < 0 || x >= 65535 || y < 0 || y >= 65535) return
             pointerData.add(Triple(pointerId, x.toInt(), y.toInt()))
         }

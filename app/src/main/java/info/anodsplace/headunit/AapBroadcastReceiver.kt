@@ -28,16 +28,18 @@ class AapBroadcastReceiver : BroadcastReceiver() {
         val component = App.provide(context)
         if (intent.action == LocationUpdateIntent.action) {
             val location = LocationUpdateIntent.extractLocation(intent)
-            if (component.settings.useGpsForNavigation) {
+            if (component.settings.useGpsForNavigation && location != null) {
                 App.provide(context).transport.send(LocationUpdateEvent(location))
             }
 
-            if (location.latitude != 0.0 && location.longitude != 0.0) {
+            if (location != null && location.latitude != 0.0 && location.longitude != 0.0) {
                 component.settings.lastKnownLocation = location
             }
         } else if (intent.action == MediaKeyIntent.action) {
-            val event = intent.getParcelableExtra<KeyEvent>(KeyIntent.extraEvent)
-            component.transport.send(event.keyCode, event.action == KeyEvent.ACTION_DOWN)
+            val event = intent.getParcelableExtra(KeyIntent.extraEvent, KeyEvent::class.java)
+            if (event != null) {
+                component.transport.send(event.keyCode, event.action == KeyEvent.ACTION_DOWN)
+            }
         } else if (intent.action == ProjectionActivityRequest.action){
             if (component.transport.isAlive) {
                 val aapIntent = Intent(context, AapProjectionActivity::class.java)
